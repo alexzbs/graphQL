@@ -1,23 +1,21 @@
 module.exports = {
-    Query: {
-        totalPhotos: (parent, args, { db }) =>
-            db.collection('photos')
-                .estimateDocumentCount(),
+    me: (parent, args, { currentUser }) => currentUser,
+    totalPhotos: (parent, args, { db }) =>
+        db.collection('photos')
+            .estimateDocumentCount(),
 
-        allPhotos: (parent, args, { db }) =>
-            db.collection('photos')
-                .find()
-                .toArray(),
+    allPhotos: (parent, args, { db }) =>
+        db.collection('photos')
+            .find()
+            .toArray(),
 
-        totalUsers: (parent, args, { db }) =>
-            db.collection('users')
-                .estimateDocumentCount().estimateDocumentCount,
+    totalUsers: (parent, args, { db }) =>
+        db.collection('users')
+            .estimateDocumentCount().estimateDocumentCount,
 
-        allUsers: (parent, args, { db }) =>
-            db.collection('users')
-                .find()
-                .toArray()
-
-    }
+    allUsers: (parent, args, { db }) =>
+        db.collection('users')
+            .find()
+            .toArray()
 
 }
