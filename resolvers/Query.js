@@ -2,7 +2,7 @@ module.exports = {
     me: (parent, args, { currentUser }) => currentUser,
     totalPhotos: (parent, args, { db }) =>
         db.collection('photos')
-            .estimateDocumentCount(),
+            .estimatedDocumentCount(),
 
     allPhotos: (parent, args, { db }) =>
         db.collection('photos')
@@ -11,7 +11,7 @@ module.exports = {
 
     totalUsers: (parent, args, { db }) =>
         db.collection('users')
-            .estimateDocumentCount().estimateDocumentCount,
+            .estimatedDocumentCount(),
 
     allUsers: (parent, args, { db }) =>
         db.collection('users')

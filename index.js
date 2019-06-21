@@ -46,8 +46,8 @@ async function start() {
     res.end(`<a href="${url}">Sign In with Github</a>`)
   })
 
-  app.listen({ port: 3000 }, () =>
-    console.log(`GraphQL Server running at http://localhost:3000${server.graphqlPath}`)
+  app.listen({ port: 4000 }, () =>
+    console.log(`GraphQL Server running at http://localhost:4000${server.graphqlPath}`)
   )
 }
 
