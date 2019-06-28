@@ -4,20 +4,30 @@ import { gql } from "apollo-boost";
 import { ROOT_QUERY } from "./App";
 
 const Users = () => (
-    <Query query={ROOT_QUERY}>
+    <Query query={ROOT_QUERY} fetchPolicy="cache-and-network">
         {({ data, loading, refetch }) =>
             loading ? (
                 <p>loading users...</p>
-            ) : (
-                    <UserList
-                        count={data.totalUsers}
-                        users={data.allUsers}
-                        refetch={refetch}
-                    />
-                )
+            ) :
+                <UserList
+                    count={data.totalUsers}
+                    users={data.allUsers}
+                    refetch={refetch}
+                />
+
         }
     </Query>
 );
+
+const updateUserCache = (cache, { data: { addFakeUsers } }) => {
+    let data = cache.readQuery({ query: ROOT_QUERY })
+    data.totalUsers += addFakeUsers.length
+    data.allUsers = [
+        ...data.allUsers,
+        ...addFakeUsers
+    ]
+    cache.writeQuery({ query: ROOT_QUERY, data })
+}
 
 const UserList = ({ count, users, refetch }) => (
     <div>
@@ -26,7 +36,7 @@ const UserList = ({ count, users, refetch }) => (
         <Mutation
             mutation={ADD_FAKE_USERS_MUTATION}
             variables={{ count: 1 }}
-            refetchQueries={[{ query: ROOT_QUERY }]}
+            update={updateUserCache}
         >
             {
                 addFakeUsers =>
