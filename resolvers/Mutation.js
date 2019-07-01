@@ -16,6 +16,8 @@ module.exports = {
             await db.collection('photos').insert(newPhoto)
         newPhoto.id = insertedIds[0]
 
+        pubsub.publish('photo-added', { newPhoto })
+
         return newPhoto
     },
 
@@ -49,10 +51,10 @@ module.exports = {
 
         return { user, token: access_token }
     },
-    addFakeUsers: async (root, { count }, { db }) => {
+    addFakeUsers: async (root, { count }, { db, pubsub }) => {
         var randomUserApi = `https://randomuser.me/api/?results=${count}`
-        var { results } = await fetch(randomUserApi)
-            .then(res => res.json())
+
+        var { results } = await fetch(randomUserApi).then(res => res.json())
 
         var users = results.map(r => ({
             githubLogin: r.login.username,
@@ -60,20 +62,28 @@ module.exports = {
             avatar: r.picture.thumbnail,
             githubToken: r.login.sha1
         }))
+
         await db.collection('users').insert(users)
+        var newUsers = await db.collection('users')
+            .find()
+            .sort({ _id: -1 })
+            .limit(count)
+            .toArray()
+
+        newUsers.forEach(newUser => pubsub.publish('user-added', { newUser }))
 
         return users
     },
-    async fakeUserAuth (parent, {githubLogin}, {db}) {
-        var user = await db.collection('users').findOne({githubLogin})
+    async fakeUserAuth(parent, { githubLogin }, { db }) {
+        var user = await db.collection('users').findOne({ githubLogin })
 
-        if(!user) {
+        if (!user) {
             throw new Error(`Cannot find user with githubLogin "${githubLogin}"`)
         }
-         return {
-             token: user.githubToken,
-             user
-         }
+        return {
+            token: user.githubToken,
+            user
+        }
     }
 
 }
