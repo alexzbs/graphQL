@@ -5,6 +5,8 @@ const { readFileSync } = require('fs')
 const expressPlayground = require('graphql-playground-middleware-express').default
 const resolvers = require('./resolvers')
 const { createServer } = require('http')
+const path = require('path')
+
 
 
 require('dotenv').config()
@@ -38,7 +40,7 @@ async function start() {
         req.headers.authorization :
         connection.context.Authorization
 
-        
+
       const currentUser =
         await db.collection('users')
           .findOne({ githubToken })
@@ -54,7 +56,9 @@ async function start() {
     let url = `https://github.com/login/oauth/authorize?client_id=${process.env.CLIENT_ID}&scope=user`
     res.end(`<a href="${url}">Sign In with Github</a>`)
   })
-
+  app.use('/img/photos',
+    express.static(path.join(__dirname, 'assets', 'photos')))
+    
   const httpServer = createServer(app)
   server.installSubscriptionHandlers(httpServer)
 
